@@ -13,21 +13,20 @@ import java.util.TimerTask;
  * to the GameView's table that'll only allows the player to move if it's their turn
  * **/
 
-public class GameController {
+public class GameController extends ClientController{
     private char turn;
     private int currentTime;
     private final GameView gameView;
     private final Object lock = new Object();
     private final int MAIN_REQUEST_PORT;
-    private ServerDAO serverDAO;
     private final int timeLimit;
     private boolean running;
     TimerTask task;
     Timer timer;
-    public GameController(int port, ServerDAO serverDAO, GameView gameView) {
+    public GameController(String hostname, int port, GameView gameView) {
+        super(hostname);
         this.gameView = gameView;
         this.gameView.setVisible(true);
-        this.serverDAO = serverDAO;
         this.MAIN_REQUEST_PORT = port;
         this.turn = 1;
         this.currentTime = 0;
@@ -37,7 +36,7 @@ public class GameController {
 
     public void play() {
 
-        char piece = (char) serverDAO.requestSendToServer(this.MAIN_REQUEST_PORT, "Piece", this.gameView.getNguoichoi()).getObject();
+        char piece = (char) requestSendToServer(this.MAIN_REQUEST_PORT, "Piece", this.gameView.getNguoichoi()).getObject();
         this.gameView.setPiece(piece);
         System.out.println(piece);
         MoveListener moveListener = new MoveListener();
@@ -57,7 +56,7 @@ public class GameController {
                     GameController.this.gameView.setTime(currentTime);
                 }
                 else {
-                    GameController.this.serverDAO.requestSendToServer(MAIN_REQUEST_PORT, "ChangeTurn", GameController.this.gameView.getNguoichoi());
+                    GameController.this.requestSendToServer(MAIN_REQUEST_PORT, "ChangeTurn", GameController.this.gameView.getNguoichoi());
                     cancel();
                 }
             }
@@ -78,7 +77,7 @@ public class GameController {
                         ToaDo toaDo = new ToaDo(gameView.getJTable().getSelectedColumn(), gameView.getJTable().getSelectedRow());
                         if (gameView.getJTable().getValueAt(toaDo.getY(), toaDo.getX()) == null) {
                             gameView.playerMove(toaDo);
-                            GameController.this.serverDAO.requestSendToServer(MAIN_REQUEST_PORT, "NuocDi", toaDo);
+                            GameController.this.requestSendToServer(MAIN_REQUEST_PORT, "NuocDi", toaDo);
                             timer.cancel();
                         }
                     }
@@ -93,7 +92,7 @@ public class GameController {
             // TODO: Synchronize the time between the two client
             while (running) {
 
-                turn = (char) GameController.this.serverDAO.requestSendToServer(MAIN_REQUEST_PORT, "Turn", GameController.this.gameView.getNguoichoi()).getObject();
+                turn = (char) GameController.this.requestSendToServer(MAIN_REQUEST_PORT, "Turn", GameController.this.gameView.getNguoichoi()).getObject();
 
                 if (turn == GameController.this.gameView.getPiece()) {
                     if (!timerReseted) {
@@ -105,7 +104,7 @@ public class GameController {
                 else {
                     timerReseted = false;
                 }
-                ToaDo nuocDiGanNhat = (ToaDo) GameController.this.serverDAO.requestSendToServer(MAIN_REQUEST_PORT, "ToaDo", GameController.this.gameView.getNguoichoi()).getObject();
+                ToaDo nuocDiGanNhat = (ToaDo) GameController.this.requestSendToServer(MAIN_REQUEST_PORT, "ToaDo", GameController.this.gameView.getNguoichoi()).getObject();
 
                 if (nuocDiGanNhat == null)
                     continue;
@@ -114,7 +113,7 @@ public class GameController {
                     GameController.this.gameView.oponentMove(nuocDiGanNhat);
                 }
 
-                int status = (int) GameController.this.serverDAO.requestObjectFromServer(MAIN_REQUEST_PORT, "Status").getObject();
+                int status = (int) GameController.this.requestObjectFromServer(MAIN_REQUEST_PORT, "Status").getObject();
                 if (status != -1) {
                     if (status != 0)
                         gameView.showDialog("Người chơi " + (status == 'x' ? 1 : 2) + " thắng");

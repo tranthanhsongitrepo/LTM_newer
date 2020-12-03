@@ -4,22 +4,21 @@ import client.view.RankView;
 
 import java.util.ArrayList;
 
-public class RankController {
+public class RankController extends ClientController{
 
     private final int MAIN_REQUEST_PORT;
     private RankView rankView;
-    private ServerDAO serverDAO;
-    
-    public RankController(int port, ServerDAO serverDAO, RankView rankView) {
+
+    public RankController(String hostname, int port, RankView rankView) {
+        super(hostname);
         this.MAIN_REQUEST_PORT = port;
-        serverDAO.openConnection(MAIN_REQUEST_PORT);
-        this.serverDAO = serverDAO;
+        openConnection(MAIN_REQUEST_PORT);
         this.rankView = rankView;
         this.rankView.updateTable(getRankings());
         this.rankView.setVisible(true);
     }
 
     public ArrayList<Object[]> getRankings() {
-        return (ArrayList<Object[]>) serverDAO.requestObjectFromServer(MAIN_REQUEST_PORT, "Rankings").getObject();
+        return (ArrayList<Object[]>) requestObjectFromServer(MAIN_REQUEST_PORT, "Rankings").getObject();
     }
 }

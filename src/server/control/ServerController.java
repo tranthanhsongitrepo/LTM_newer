@@ -9,6 +9,7 @@ import server.DAO.RankingDAO;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -20,15 +21,16 @@ public class ServerController extends Thread{
     private HashMap<Integer, ServerSocket> serverSockets;
     protected HashMap<InetSocketAddress, ObjectInputStream> iss;
     protected HashMap<InetSocketAddress, ObjectOutputStream> oss;
-    protected HashMap<NguoiChoi, ServerGameController> onGoingGames;
-    protected HashMap<NguoiChoi, InetSocketAddress> nguoiChoiAddresses;
-
+    protected HashMap<InetAddress, ServerGameController> onGoingGames;
+    protected HashMap<NguoiChoi, InetAddress> nguoiChoiAddresses;
+    protected HashMap<InetAddress, NguoiChoi> addressNguoiChoi;
     public ServerController() {
         serverSockets = new HashMap<>();
         iss = new HashMap<>();
         oss = new HashMap<>();
         this.nguoiChoiAddresses = new HashMap<>();
         this.onGoingGames = new HashMap<>();
+        this.addressNguoiChoi = new HashMap<>();
     }
 
     public void openConnection(int port) {
@@ -80,9 +82,15 @@ public class ServerController extends Thread{
         return receiveMessage(address);
     }
 
-    public ServerGameController getOngoingGame(NguoiChoi nguoiChoi) {
+    public ServerGameController getOngoingGame(InetAddress nguoiChoi) {
         return onGoingGames.get(nguoiChoi);
     }
+
+    public NguoiChoi getNguoiChoiFromAddress(InetAddress address) {
+        return addressNguoiChoi.get(address);
+    }
+
+
     class ConnectionListener extends Thread {
         private final int port;
 
@@ -117,7 +125,6 @@ public class ServerController extends Thread{
     class RequestListener extends Thread {
         private final InetSocketAddress clientAddress;
         private boolean running;
-        private NguoiChoi nguoiChoi;
 
         public RequestListener(InetSocketAddress clientAddress) {
             this.clientAddress = clientAddress;
@@ -140,46 +147,49 @@ public class ServerController extends Thread{
                             // Get the opponent's address
                             String opponentName = (String) message.getObject();
 
-                            InetSocketAddress opponentAddress = nguoiChoiAddresses.get(new NguoiChoi(opponentName, ""));
-                            NguoiChoi nguoichoi1 = (NguoiChoi) sendRequestToClient(this.clientAddress, new Message("NguoiChoi", null)).getObject();
+                            InetSocketAddress opponentAddress = new InetSocketAddress(nguoiChoiAddresses.get(new NguoiChoi(opponentName, "")), this.clientAddress.getPort());
+                            NguoiChoi nguoichoi1 = addressNguoiChoi.get(this.clientAddress.getAddress());
                             // Send a challenge to the second user
                             response = new Message("Challenge", nguoichoi1);
                             sendMessage(opponentAddress, response);
                             break;
 
                         case "Turn":
-                            message.setObject(getOngoingGame(this.nguoiChoi).getTurn());
+                            message.setObject(getOngoingGame(this.clientAddress.getAddress()).getTurn());
                             sendMessage(clientAddress, message);
                             break;
                         case "ToaDo":
-                            message.setObject(getOngoingGame((NguoiChoi) message.getObject()).getNuocDiGanNhat());
+                            message.setObject(getOngoingGame(this.clientAddress.getAddress()).getNuocDiGanNhat());
                             sendMessage(clientAddress, message);
                             break;
                         case "NuocDi":
-                            getOngoingGame(this.nguoiChoi).setNuocDiGanNhat((ToaDo) message.getObject());
-                            getOngoingGame(this.nguoiChoi).move();
+                            getOngoingGame(this.clientAddress.getAddress()).setNuocDiGanNhat((ToaDo) message.getObject());
+                            getOngoingGame(this.clientAddress.getAddress()).move();
                             response = new Message("OK", null);
                             sendMessage(clientAddress, response);
                             break;
                         case "Status":
-                            response = new Message("OK", getOngoingGame(this.nguoiChoi).checkWin());
+                            response = new Message("OK", getOngoingGame(this.clientAddress.getAddress()).checkWin());
                             sendMessage(clientAddress, response);
                             break;
 
                         case "ChangeTurn":
-                            getOngoingGame((NguoiChoi) message.getObject()).changeTurn();
+                            getOngoingGame(this.clientAddress.getAddress()).changeTurn();
                             response = new Message("OK", null);
                             sendMessage(clientAddress, response);
                             break;
 
                         case "Login":
                             NguoiChoiDAO nguoiChoiDAO = new NguoiChoiDAO("jdbc:mysql://127.0.0.1:3306/?useSSL=false", "root", "password");
-                            this.nguoiChoi = (NguoiChoi) message.getObject();
+
+                            NguoiChoi nguoiChoi = (NguoiChoi) message.getObject();
                             int res = nguoiChoiDAO.checkLogin(nguoiChoi);
                             nguoiChoi.setId(res);
 
-                            if (res != -1)
-                                nguoiChoiAddresses.put(nguoiChoi, this.clientAddress);
+                            if (res != -1) {
+                                nguoiChoiAddresses.put(nguoiChoi, this.clientAddress.getAddress());
+                                addressNguoiChoi.put(this.clientAddress.getAddress(), nguoiChoi);
+                            }
                             sendMessage(this.clientAddress, new Message("Results", res));
                             break;
 
@@ -193,7 +203,7 @@ public class ServerController extends Thread{
                             Set<NguoiChoi> onlineList = nguoiChoiAddresses.keySet();
 
                             for (NguoiChoi it : onlineList) {
-                                if (onGoingGames.containsKey(it)) {
+                                if (onGoingGames.get(nguoiChoiAddresses.get(it)) != null) {
                                     it.setTrangThai("Bận");
                                 }
                             }
@@ -203,19 +213,21 @@ public class ServerController extends Thread{
                             break;
                         case "Accept":
                             NguoiChoi opponent = (NguoiChoi) message.getObject();
-                            opponentAddress = nguoiChoiAddresses.get(new NguoiChoi(opponent.getTenDangNhap(), ""));
+
+                            opponentAddress = new InetSocketAddress(nguoiChoiAddresses.get(new NguoiChoi(opponent.getTenDangNhap(), ""))
+                                    , this.clientAddress.getPort());
                             sendMessage(opponentAddress, new Message("Accept"));
-                            sendMessage(opponentAddress, new Message("Stop"));
-                            ServerGameController serverGameController = new ServerGameController(opponent, this.nguoiChoi, 100);
-                            onGoingGames.put(opponent, serverGameController);
-                            onGoingGames.put(this.nguoiChoi, serverGameController);
+                            System.out.println("Accepted " + opponentAddress);
+                            ServerGameController serverGameController = new ServerGameController(opponent, getNguoiChoiFromAddress(this.clientAddress.getAddress()), 100);
+                            onGoingGames.put(opponentAddress.getAddress(), serverGameController);
+                            onGoingGames.put(this.clientAddress.getAddress(), serverGameController);
                             break;
                         case "Decline":
                             break;
 
                         case "Piece":
-                            ServerGameController game = onGoingGames.get((NguoiChoi) message.getObject());
-                            sendMessage(this.clientAddress, new Message("Piece", game.getNguoiChoi1().equals(this.nguoiChoi) ? 'x' : 'o'));
+                            ServerGameController game = getOngoingGame(this.clientAddress.getAddress());
+                            sendMessage(this.clientAddress, new Message("Piece", game.getNguoiChoi1().equals(getNguoiChoiFromAddress(this.clientAddress.getAddress())) ? 'x' : 'o'));
                             break;
 
                     }
@@ -224,6 +236,7 @@ public class ServerController extends Thread{
                     break;
                 }
             }
+            closeConnection(this.clientAddress);
         }
     }
 }

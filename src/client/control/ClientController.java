@@ -12,13 +12,13 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.HashMap;
 
-public class ServerDAO {
+public class ClientController {
     protected HashMap<Integer, Socket> clientSockets;
     protected String hostName;
     protected HashMap<Integer, ObjectOutputStream> oss;
     protected HashMap<Integer, ObjectInputStream> iss;
 
-    public ServerDAO(String hostName) {
+    public ClientController(String hostName) {
         this.hostName = hostName;
         this.clientSockets = new HashMap<>();
         this.oss = new HashMap<>();

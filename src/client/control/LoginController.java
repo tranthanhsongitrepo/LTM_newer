@@ -7,17 +7,16 @@ import model.NguoiChoi;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class LoginController {
+public class LoginController extends ClientController{
     private final int MAIN_REQUEST_PORT;
     private LoginView loginView;
-    private ServerDAO serverDAO;
-    
-    public LoginController(int hostPort, ServerDAO serverDAO, LoginView loginView){
+
+    public LoginController(String hostname, int hostPort , LoginView loginView){
+        super(hostname);
         MAIN_REQUEST_PORT = hostPort;
         this.loginView = loginView;
-        this.serverDAO = serverDAO;
         loginView.setVisible(true);
-        serverDAO.openConnection(hostPort);
+        openConnection(hostPort);
         loginView.addLoginListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -28,8 +27,7 @@ public class LoginController {
                     OnlineView onlineView = new OnlineView(nguoichoi);
                     loginView.setVisible(false);
                     onlineView.setVisible(true);
-                    serverDAO.closeConnection(MAIN_REQUEST_PORT);
-                    OnlineController onlineController = new OnlineController(MAIN_REQUEST_PORT, 9998, serverDAO, onlineView);
+                    OnlineController onlineController = new OnlineController(hostname, MAIN_REQUEST_PORT, 9998, onlineView);
                     onlineController.play();
                 }
                 else {
@@ -40,7 +38,7 @@ public class LoginController {
     }
 
     public int checkLogin(NguoiChoi user){
-        return (int) serverDAO.requestSendToServer(MAIN_REQUEST_PORT, "Login", user).getObject();
+        return (int) requestSendToServer(MAIN_REQUEST_PORT, "Login", user).getObject();
     }
 
 }
