@@ -28,6 +28,7 @@ public class LoginController {
                     OnlineView onlineView = new OnlineView(nguoichoi);
                     loginView.setVisible(false);
                     onlineView.setVisible(true);
+                    serverDAO.closeConnection(MAIN_REQUEST_PORT);
                     OnlineController onlineController = new OnlineController(MAIN_REQUEST_PORT, 9998, serverDAO, onlineView);
                     onlineController.play();
                 }

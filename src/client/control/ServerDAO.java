@@ -33,10 +33,9 @@ public class ServerDAO {
 
     public Object receiveObject(int port) {
         try {
-            ObjectInputStream is = iss.get(port);
 
-            synchronized (is) {
-                return is.readObject();
+            synchronized (iss.get(port)) {
+                return iss.get(port).readObject();
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -79,11 +78,10 @@ public class ServerDAO {
 
     public void sendObject(int port, Object object){
         try {
-            ObjectOutputStream os = oss.get(port);
-
-            synchronized (os) {
-                os.writeObject(object);
-                os.flush();
+            synchronized (oss.get(port)) {
+                oss.get(port).writeObject(object);
+                oss.get(port).flush();
+                oss.get(port).reset();
             }
         } catch (IOException e) {
             e.printStackTrace();

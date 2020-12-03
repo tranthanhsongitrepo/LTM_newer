@@ -18,12 +18,13 @@ public class OnlineController {
     private ServerDAO serverDAO;
     private volatile boolean running;
 
-    public OnlineController( int mainPort, int subPort, ServerDAO serverDAO, OnlineView onlineView) {
+    public OnlineController(int mainPort, int subPort, ServerDAO serverDAO, OnlineView onlineView) {
         this.serverDAO = serverDAO;
         this.MAIN_REQUEST_PORT = mainPort;
         this.SUB_REQUEST_PORT = subPort;
         this.onlineView = onlineView;
 
+        serverDAO.openConnection(MAIN_REQUEST_PORT);
         serverDAO.openConnection(SUB_REQUEST_PORT);
 
         onlineView.addRankingButtonListener(new java.awt.event.ActionListener() {
@@ -107,7 +108,7 @@ public class OnlineController {
                             break;
                     }
                 }
-                finally {
+                catch (Exception e) {
                     break;
                 }
             }

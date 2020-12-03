@@ -220,7 +220,7 @@ public class ServerController extends Thread{
 
                     }
                 }
-                finally {
+                catch (Exception e) {
                     break;
                 }
             }
