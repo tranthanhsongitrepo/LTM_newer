@@ -1,10 +1,11 @@
 package server.control;
 
+import model.BangXepHang;
 import model.Message;
 import model.NguoiChoi;
 import model.ToaDo;
-import server.DAO.NguoiChoiDAO;
-import server.DAO.BangXepHangDAO;
+import server.control.DAO.NguoiChoiDAO;
+import server.control.DAO.BangXepHangDAO;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,6 +14,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -184,6 +186,7 @@ public class ServerController extends Thread{
 
                             NguoiChoi nguoiChoi = (NguoiChoi) message.getObject();
                             int res = nguoiChoiDAO.checkLogin(nguoiChoi);
+                            nguoiChoiDAO.closeConnection();
                             nguoiChoi.setId(res);
 
                             if (res != -1) {
@@ -194,7 +197,10 @@ public class ServerController extends Thread{
                             break;
 
                         case "Rankings":
-                            response = new Message("Rankings", new BangXepHangDAO("jdbc:mysql://127.0.0.1:3306/?useSSL=false", "root", "password").getRankings());
+                            BangXepHangDAO bxhDAO = new BangXepHangDAO("jdbc:mysql://127.0.0.1:3306/?useSSL=false", "root", "password");
+                            response = new Message("Rankings", bxhDAO.getRankings());
+                            bxhDAO.closeConnection();
+
                             sendRequestToClient(this.clientAddress, response);
                             break;
 
@@ -202,7 +208,11 @@ public class ServerController extends Thread{
                             response = message;
                             Set<NguoiChoi> onlineList = nguoiChoiAddresses.keySet();
 
-                            for (NguoiChoi it : onlineList) {
+                            BangXepHangDAO bangXepHangDAO = new BangXepHangDAO("jdbc:mysql://127.0.0.1:3306/?useSSL=false", "root", "password");
+
+                            ArrayList<BangXepHang> rankings = bangXepHangDAO.getRankings(onlineList);
+
+                            for (BangXepHang it : rankings) {
                                 if (onGoingGames.get(nguoiChoiAddresses.get(it)) != null) {
                                     it.setTrangThai("Bận");
                                 }
@@ -210,8 +220,9 @@ public class ServerController extends Thread{
                                     it.setTrangThai("Online");
                                 }
                             }
+                            bangXepHangDAO.closeConnection();
 
-                            response.setObject(onlineList.toArray());
+                            response.setObject(rankings);
                             sendMessage(this.clientAddress, response);
                             break;
                         case "Accept":
@@ -243,6 +254,8 @@ public class ServerController extends Thread{
                         case "Stop":
                             running = false;
                             sendMessage(this.clientAddress, new Message("Stop"));
+
+                            onGoingGames.remove(this.clientAddress.getAddress());
                             break;
 
                         case "Rematch":
@@ -252,7 +265,7 @@ public class ServerController extends Thread{
 
                             // Wait for all 2 clients to respond
                             while (game.getResponses() != 2) {}
-                            System.out.println("Im " + this.clientAddress);
+
                             sendMessage(this.clientAddress, new Message("Rematch", game.getRematch()));
                             break;
                     }

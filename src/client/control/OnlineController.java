@@ -3,6 +3,7 @@ package client.control;
 import client.view.GameView;
 import client.view.OnlineView;
 import client.view.RankView;
+import model.BangXepHang;
 import model.Message;
 import model.NguoiChoi;
 
@@ -10,9 +11,10 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 public class OnlineController extends ClientController{
-    private OnlineView onlineView;
+    private final OnlineView onlineView;
     private final int SUB_REQUEST_PORT;
     private final int MAIN_REQUEST_PORT;
     private volatile boolean running;
@@ -29,6 +31,9 @@ public class OnlineController extends ClientController{
         onlineView.addRankingButtonListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                sendMessage(MAIN_REQUEST_PORT, new Message("Stop"));
+                sendMessage(SUB_REQUEST_PORT, new Message("Stop"));
+
                 RankView rankView = new RankView(onlineView.getNguoichoi());
                 RankController rankController = new RankController(hostname, MAIN_REQUEST_PORT, rankView);
                 rankView.setVisible(true);
@@ -38,7 +43,7 @@ public class OnlineController extends ClientController{
         });
         onlineView.addRefreshButtonListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Object[] objects = getAvailablePlayers(SUB_REQUEST_PORT);
+                ArrayList<BangXepHang> objects = getAvailablePlayers(SUB_REQUEST_PORT);
                 if (objects != null)
                     onlineView.updateTable(objects);
             }
@@ -58,8 +63,8 @@ public class OnlineController extends ClientController{
                 if (onlineView.showConfirmDialog("Bạn có muốn thách đấu người chơi này") == JOptionPane.YES_OPTION){
                         if (requestSendToServer(SUB_REQUEST_PORT,"Challenge", onlineView.getJTable().getValueAt(onlineView.getJTable().getSelectedRow(), 0)).getAction().equals("Accept")) {
 
-                            sendObject(MAIN_REQUEST_PORT, new Message("Stop"));
-                            sendObject(SUB_REQUEST_PORT, new Message("Stop"));
+                            sendMessage(MAIN_REQUEST_PORT, new Message("Stop"));
+                            sendMessage(SUB_REQUEST_PORT, new Message("Stop"));
 
                             System.out.println("Challenge accepted");
                             // Lock the thread until the RequestListener is fully closed
@@ -72,13 +77,16 @@ public class OnlineController extends ClientController{
                             gameController.play();
                             onlineView.dispose();
                     }
+                        else {
+                            onlineView.showMessageDialog("Đối thủ từ chối");
+                        }
                 }
          }
         });
     }
 
-    public Object[] getAvailablePlayers(int port) {
-        return (Object[]) requestObjectFromServer(port, "OnlineList").getObject();
+    public ArrayList<BangXepHang> getAvailablePlayers(int port) {
+        return (ArrayList<BangXepHang>) requestObjectFromServer(port, "OnlineList").getObject();
     }
 
     public void play() {
@@ -95,15 +103,15 @@ public class OnlineController extends ClientController{
         public void run() {
             while (running) {
                 try {
-                    Message message = (Message) receiveObject(MAIN_REQUEST_PORT);
+                    Message message = receiveMessage(MAIN_REQUEST_PORT);
                     switch (message.getAction()) {
                         case "Challenge":
-                            int choice = onlineView.showConfirmDialog("Nguoi choi " + ((NguoiChoi) message.getObject()).getTenDangNhap() + " thach dau");
-                            sendObject(MAIN_REQUEST_PORT, new Message(choice == JOptionPane.YES_OPTION ? "Accept" : "Decline", message.getObject()));
+                            int choice = onlineView.showConfirmDialog("Người chơi " + ((NguoiChoi) message.getObject()).getTenDangNhap() + " thách đấu");
+                            sendMessage(MAIN_REQUEST_PORT, new Message(choice == JOptionPane.YES_OPTION ? "Accept" : "Decline", message.getObject()));
                             if (choice == JOptionPane.YES_OPTION) {
                                 running = false;
-                                sendObject(MAIN_REQUEST_PORT, new Message("Stop"));
-                                sendObject(SUB_REQUEST_PORT, new Message("Stop"));
+                                sendMessage(MAIN_REQUEST_PORT, new Message("Stop"));
+                                sendMessage(SUB_REQUEST_PORT, new Message("Stop"));
                                 GameView gameView = new GameView(onlineView.getNguoichoi());
                                 GameController gameController = new GameController(OnlineController.this.hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, gameView);
                                 gameController.play();
@@ -111,7 +119,7 @@ public class OnlineController extends ClientController{
                             }
                             break;
                         case "NguoiChoi":
-                            sendObject(MAIN_REQUEST_PORT, new Message("NguoiChoi", OnlineController.this.onlineView.getNguoichoi()));
+                            sendMessage(MAIN_REQUEST_PORT, new Message("NguoiChoi", OnlineController.this.onlineView.getNguoichoi()));
                             break;
                         // TODO : Clean this up
                         case "Stop":
@@ -124,7 +132,7 @@ public class OnlineController extends ClientController{
                     break;
                 }
             }
-            OnlineController.this.sendObject(MAIN_REQUEST_PORT, new Message("Stop"));
+            OnlineController.this.sendMessage(MAIN_REQUEST_PORT, new Message("Stop"));
         }
     }
 }

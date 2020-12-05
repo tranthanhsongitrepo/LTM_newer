@@ -3,7 +3,7 @@ package server.control;
 import model.BangXepHang;
 import model.NguoiChoi;
 import model.ToaDo;
-import server.DAO.BangXepHangDAO;
+import server.control.DAO.BangXepHangDAO;
 
 public class ServerGameController {
     private int[][] banCo;
@@ -164,15 +164,15 @@ public class ServerGameController {
         }
 
         if (soBuocDi1 + soBuocDi2 == banCo.length * banCo.length) {
-            nguoiChoi1.setTongSoDiem((float) (nguoiChoi1.getTongSoDiem() + 0.5));
-            nguoiChoi2.setTongSoDiem((float) (nguoiChoi2.getTongSoDiem() + 0.5));
+            nguoiChoi1.setTongDiem((float) (nguoiChoi1.getTongDiem() + 0.5));
+            nguoiChoi2.setTongDiem((float) (nguoiChoi2.getTongDiem() + 0.5));
             return 0;
         }
 
         if (won) {
             BangXepHang winner, loser;
             int soBuocDiWinner, soBuocDiLoser;
-            if (player == 1) {
+            if (player == 'x') {
                 winner = nguoiChoi1;
                 loser = nguoiChoi2;
                 soBuocDiWinner = soBuocDi1;
@@ -185,7 +185,7 @@ public class ServerGameController {
                 soBuocDiLoser = soBuocDi1;
             }
 
-            winner.setTongSoDiem(winner.getTongSoDiem() + 1);
+            winner.setTongDiem(winner.getTongDiem() + 1);
 
             winner.setSoTranDauDaChoi(winner.getSoTranDauDaChoi() + 1);
             loser.setSoTranDauDaChoi(loser.getSoTranDauDaChoi() + 1);
@@ -193,8 +193,8 @@ public class ServerGameController {
             winner.setSoTranThang(winner.getSoTranThang() + 1);
             loser.setSoTranThua(loser.getSoTranThua() + 1);
 
-            winner.setTongDiemDoiThu(winner.getTongDiemDoiThu() + loser.getTongSoDiem());
-            loser.setTongDiemDoiThu(loser.getTongDiemDoiThu() + winner.getTongSoDiem());
+            winner.setTongDiemDoiThu(winner.getTongDiemDoiThu() + loser.getTongDiem());
+            loser.setTongDiemDoiThu(loser.getTongDiemDoiThu() + winner.getTongDiem());
 
             winner.setTongSoNuocDiTranThang(winner.getTongSoNuocDiTranThang() + soBuocDiWinner);
             loser.setTongSoNuocDiTranThua(loser.getTongSoNuocDiTranThua() + soBuocDiLoser);
@@ -202,6 +202,10 @@ public class ServerGameController {
             BangXepHangDAO bangXepHangDAO = new BangXepHangDAO("jdbc:mysql://127.0.0.1:3306/?useSSL=false", "root", "password");
             bangXepHangDAO.updateTable(winner);
             bangXepHangDAO.updateTable(loser);
+
+            bangXepHangDAO.closeConnection();
+
+            return player;
 
         }
         // TODO: Add check for draw using the sum of the player's total number of moves

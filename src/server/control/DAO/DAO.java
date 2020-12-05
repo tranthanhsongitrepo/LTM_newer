@@ -1,19 +1,11 @@
-package server.DAO;
+package server.control.DAO;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DAO {
     protected Connection con;
-    private ServerSocket serverSocket;
-    protected ObjectInputStream is;
-    protected ObjectOutputStream os;
 
     public DAO(String dbUrl, String username, String password) {
         try{
@@ -22,6 +14,14 @@ public class DAO {
         }
         catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void closeConnection() {
+        try {
+            con.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
     }
 }

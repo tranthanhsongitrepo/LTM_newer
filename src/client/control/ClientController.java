@@ -1,15 +1,11 @@
 package client.control;
 
 import model.Message;
-import org.apache.commons.net.ntp.NTPUDPClient;
-import org.apache.commons.net.ntp.TimeInfo;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Date;
 import java.util.HashMap;
 
 public class ClientController {
@@ -28,14 +24,14 @@ public class ClientController {
     public Message requestSendToServer(int port, String action, Object object) {
         System.out.println(action);
         Message message = new Message(action, object);
-        sendObject(port, message);
-        return (Message) receiveObject(port);
+        sendMessage(port, message);
+        return receiveMessage(port);
     }
 
-    public Object receiveObject(int port) {
+    public Message receiveMessage(int port) {
         try {
             synchronized (iss.get(port)) {
-                return iss.get(port).readObject();
+                return (Message) iss.get(port).readObject();
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -46,8 +42,8 @@ public class ClientController {
     public Message requestObjectFromServer(int port, String action) {
         System.out.println(action);
         Message message = new Message(action);
-        sendObject(port, message);
-        return (Message) receiveObject(port);
+        sendMessage(port, message);
+        return receiveMessage(port);
     }
 
     public void openConnection(int port) {
@@ -78,7 +74,7 @@ public class ClientController {
         }
     }
 
-    public void sendObject(int port, Object object){
+    public void sendMessage(int port, Message object){
         try {
             synchronized (oss.get(port)) {
                 oss.get(port).writeObject(object);
@@ -89,20 +85,4 @@ public class ClientController {
         }
     }
 
-    public synchronized Date getNTPTime() {
-        Date time;
-        try {
-            String TIME_SERVER = "time-a.nist.gov";
-            NTPUDPClient timeClient = new NTPUDPClient();
-            InetAddress inetAddress = InetAddress.getByName(TIME_SERVER);
-            TimeInfo timeInfo = timeClient.getTime(inetAddress);
-            long returnTime = timeInfo.getReturnTime();
-            time = new Date(returnTime);
-            System.out.println("Time from " + TIME_SERVER + ": " + time);
-            return time;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

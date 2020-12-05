@@ -1,8 +1,7 @@
-package server.DAO;
+package server.control.DAO;
 
 import model.NguoiChoi;
 
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

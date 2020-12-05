@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 
 public class LoginController extends ClientController{
     private final int MAIN_REQUEST_PORT;
-    private LoginView loginView;
+    private final LoginView loginView;
 
     public LoginController(String hostName, int hostPort , LoginView loginView){
         super(hostName);
@@ -24,7 +24,7 @@ public class LoginController extends ClientController{
                 NguoiChoi nguoichoi = loginView.getNguoiChoiFromInputs();
                 int res = checkLogin(nguoichoi);
                 if (res != -1) {
-                    sendObject(MAIN_REQUEST_PORT, new Message("Stop"));
+                    sendMessage(MAIN_REQUEST_PORT, new Message("Stop"));
                     nguoichoi.setId(res);
                     OnlineView onlineView = new OnlineView(nguoichoi);
                     loginView.dispose();

@@ -1,6 +1,8 @@
+package server;
+
 import server.control.ServerController;
 
-public class Test {
+public class ServerRun {
     public static void main(String[] args) {
         ServerController gameController = new ServerController();
         gameController.openConnection(9999);

@@ -5,13 +5,14 @@
  */
 package client.view;
 
+import model.BangXepHang;
 import model.NguoiChoi;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.util.ArrayList;
 
 /**
  *
@@ -124,13 +125,14 @@ public class OnlineView extends javax.swing.JFrame {
         return nguoichoi;
     }
 
-    public void updateTable(Object[] objects) {
-        ((DefaultTableModel) jTable1.getModel()).setRowCount(objects.length - 1);
+    public void updateTable(ArrayList<BangXepHang> objects) {
+        ((DefaultTableModel) jTable1.getModel()).setRowCount(objects.size() - 1);
         int j = 0;
-        for (int i = 0; i < objects.length; i++) {
-            NguoiChoi curNguoiChoi = (NguoiChoi) objects[i];
+        for (int i = 0; i < objects.size(); i++) {
+            BangXepHang curNguoiChoi = objects.get(i);
             if (curNguoiChoi.getId() != this.getNguoichoi().getId()) {
                 jTable1.setValueAt(curNguoiChoi.getTenDangNhap(), j, 0);
+                jTable1.setValueAt(curNguoiChoi.getTongDiem(), j, 1);
                 jTable1.setValueAt(curNguoiChoi.getTrangThai(), j, 2);
                 j ++;
             }
@@ -142,6 +144,10 @@ public class OnlineView extends javax.swing.JFrame {
     }
     public int showConfirmDialog(String s) {
         return JOptionPane.showConfirmDialog(null, s);
+    }
+
+    public void showMessageDialog(String s) {
+        JOptionPane.showMessageDialog(null, s);
     }
 
     public void addExitButtonListener(ActionListener actionListener) {

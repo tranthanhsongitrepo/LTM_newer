@@ -69,7 +69,7 @@ public class GameView extends javax.swing.JFrame {
 
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Play Game");
+        setTitle("Chơi game");
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {

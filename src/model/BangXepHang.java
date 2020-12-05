@@ -2,7 +2,7 @@ package model;
 
 public class BangXepHang extends NguoiChoi {
 
-	private float tongSoDiem;
+	private float tongDiem;
 	private float tongDiemDoiThu;
 	private int tongSoNuocDiTranThang;
 	private int tongSoNuocDiTranThua;
@@ -12,12 +12,12 @@ public class BangXepHang extends NguoiChoi {
 		super(tenDangNhap);
 	}
 
-	public float getTongSoDiem() {
-		return tongSoDiem;
+	public float getTongDiem() {
+		return tongDiem;
 	}
 
-	public void setTongSoDiem(float tongSoDiem) {
-		this.tongSoDiem = tongSoDiem;
+	public void setTongDiem(float tongDiem) {
+		this.tongDiem = tongDiem;
 	}
 
 	public float getTongDiemDoiThu() {

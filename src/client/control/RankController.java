@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class RankController extends ClientController{
 
     private final int MAIN_REQUEST_PORT;
-    private RankView rankView;
+    private final RankView rankView;
 
     public RankController(String hostname, int port, RankView rankView) {
         super(hostname);

@@ -161,6 +161,11 @@ public class GameController extends ClientController{
                     }
                 }
             }
+            requestObjectFromServer(MAIN_REQUEST_PORT, "Stop");
+            requestObjectFromServer(SUB_REQUEST_PORT, "Stop");
+
+            GameController.this.closeConnection(MAIN_REQUEST_PORT);
+            GameController.this.closeConnection(SUB_REQUEST_PORT);
         }
     }
 }
