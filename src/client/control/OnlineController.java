@@ -63,15 +63,6 @@ public class OnlineController extends ClientController{
                 if (onlineView.showConfirmDialog("Bạn có muốn thách đấu người chơi này") == JOptionPane.YES_OPTION){
                         if (requestSendToServer(SUB_REQUEST_PORT,"Challenge", onlineView.getJTable().getValueAt(onlineView.getJTable().getSelectedRow(), 0)).getAction().equals("Accept")) {
 
-                            sendMessage(MAIN_REQUEST_PORT, new Message("Stop"));
-                            sendMessage(SUB_REQUEST_PORT, new Message("Stop"));
-
-                            System.out.println("Challenge accepted");
-                            // Lock the thread until the RequestListener is fully closed
-                            while (true) {
-                                if (!running)
-                                    break;
-                            }
                             GameView gameView = new GameView(onlineView.getNguoichoi());
                             GameController gameController = new GameController(hostname, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, gameView);
                             gameController.play();
@@ -110,8 +101,7 @@ public class OnlineController extends ClientController{
                             sendMessage(MAIN_REQUEST_PORT, new Message(choice == JOptionPane.YES_OPTION ? "Accept" : "Decline", message.getObject()));
                             if (choice == JOptionPane.YES_OPTION) {
                                 running = false;
-                                sendMessage(MAIN_REQUEST_PORT, new Message("Stop"));
-                                sendMessage(SUB_REQUEST_PORT, new Message("Stop"));
+
                                 GameView gameView = new GameView(onlineView.getNguoichoi());
                                 GameController gameController = new GameController(OnlineController.this.hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, gameView);
                                 gameController.play();
@@ -132,7 +122,6 @@ public class OnlineController extends ClientController{
                     break;
                 }
             }
-            OnlineController.this.sendMessage(MAIN_REQUEST_PORT, new Message("Stop"));
         }
     }
 }

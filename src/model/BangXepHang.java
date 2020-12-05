@@ -24,7 +24,7 @@ public class BangXepHang extends NguoiChoi {
 		return tongDiemDoiThu;
 	}
 
-	public void setTongDiemDoiThu(float TongDiemDoiThu) {
+	public void setTongDiemDoiThu(float tongDiemDoiThu) {
 		this.tongDiemDoiThu = tongDiemDoiThu;
 	}
 

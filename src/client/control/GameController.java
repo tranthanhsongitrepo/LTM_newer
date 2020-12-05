@@ -145,13 +145,14 @@ public class GameController extends ClientController{
                     if (rematch) {
                         NguoiChoi nguoiChoi = gameView.getNguoichoi();
                         gameView.dispose();
-                        running = false;
 
                         GameView newGameView = new GameView(nguoiChoi);
                         GameController newGameController = new GameController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, newGameView);
                         newGameController.play();
                     }
                     else {
+                        running = false;
+                        
                         OnlineView onlineView = new OnlineView(GameController.this.gameView.getNguoichoi());
                         onlineView.setVisible(true);
                         OnlineController onlineController = new OnlineController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, onlineView);
