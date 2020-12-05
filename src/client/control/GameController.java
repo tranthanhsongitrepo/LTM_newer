@@ -1,8 +1,11 @@
 package client.control;
 
 import client.view.GameView;
+import client.view.OnlineView;
+import model.NguoiChoi;
 import model.ToaDo;
 
+import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -16,22 +19,24 @@ import java.util.TimerTask;
 public class GameController extends ClientController{
     private char turn;
     private int currentTime;
-    private final GameView gameView;
-    private final Object lock = new Object();
-    private final int MAIN_REQUEST_PORT;
+    private GameView gameView;
+    private final int MAIN_REQUEST_PORT, SUB_REQUEST_PORT;
     private final int timeLimit;
     private boolean running;
-    TimerTask task;
-    Timer timer;
-    public GameController(String hostname, int port, GameView gameView) {
+    private TimerTask task;
+    private Timer timer;
+    public GameController(String hostname, int mainPort, int subPort, GameView gameView) {
         super(hostname);
         this.gameView = gameView;
         this.gameView.setVisible(true);
-        this.MAIN_REQUEST_PORT = port;
+        this.MAIN_REQUEST_PORT = mainPort;
+        this.SUB_REQUEST_PORT = subPort;
+        openConnection(MAIN_REQUEST_PORT);
+        openConnection(SUB_REQUEST_PORT);
         this.turn = 1;
         this.currentTime = 0;
         this.timeLimit = 15;
-        this.running = false;
+        this.running = true;
     }
 
     public void play() {
@@ -56,7 +61,7 @@ public class GameController extends ClientController{
                     GameController.this.gameView.setTime(currentTime);
                 }
                 else {
-                    GameController.this.requestSendToServer(MAIN_REQUEST_PORT, "ChangeTurn", GameController.this.gameView.getNguoichoi());
+                    GameController.this.requestSendToServer(SUB_REQUEST_PORT, "ChangeTurn", GameController.this.gameView.getNguoichoi());
                     cancel();
                 }
             }
@@ -66,24 +71,28 @@ public class GameController extends ClientController{
         timer.scheduleAtFixedRate(task, 1000, 1000);
     }
 
-    class MoveListener extends Thread {
-        public MoveListener() {
-            MouseAdapter mouseAdapter = new java.awt.event.MouseAdapter() {
-                public void mouseClicked(java.awt.event.MouseEvent evt) {
-                    if (turn != gameView.getPiece()) {
-                        gameView.showDialog("Hiện tại không phải lượt của bạn");
-                    }
-                    else {
-                        ToaDo toaDo = new ToaDo(gameView.getJTable().getSelectedColumn(), gameView.getJTable().getSelectedRow());
-                        if (gameView.getJTable().getValueAt(toaDo.getY(), toaDo.getX()) == null) {
-                            gameView.playerMove(toaDo);
-                            GameController.this.requestSendToServer(MAIN_REQUEST_PORT, "NuocDi", toaDo);
-                            timer.cancel();
-                        }
+    public void addListeners() {
+        MouseAdapter mouseAdapter = new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (turn != gameView.getPiece()) {
+                    gameView.showMessageDialog("Hiện tại không phải lượt của bạn");
+                }
+                else {
+                    ToaDo toaDo = new ToaDo(gameView.getJTable().getSelectedColumn(), gameView.getJTable().getSelectedRow());
+                    if (gameView.getJTable().getValueAt(toaDo.getY(), toaDo.getX()) == null) {
+                        gameView.playerMove(toaDo);
+                        GameController.this.requestSendToServer(SUB_REQUEST_PORT, "NuocDi", toaDo);
+                        timer.cancel();
                     }
                 }
-            };
-            gameView.getJTable().addMouseListener(mouseAdapter);
+            }
+        };
+        gameView.getJTable().addMouseListener(mouseAdapter);
+    }
+
+    class MoveListener extends Thread {
+        public MoveListener() {
+            addListeners();
         }
 
         public void run() {
@@ -116,10 +125,40 @@ public class GameController extends ClientController{
                 int status = (int) GameController.this.requestObjectFromServer(MAIN_REQUEST_PORT, "Status").getObject();
                 if (status != -1) {
                     if (status != 0)
-                        gameView.showDialog("Người chơi " + (status == 'x' ? 1 : 2) + " thắng");
+                        gameView.showMessageDialog("Người chơi " + (status == 'x' ? 1 : 2) + " thắng");
                     else
                         gameView.showDialog("Hòa");
-                    return;
+
+                    boolean rematch = false;
+                    if (gameView.showDialog("Bạn có muốn thách đấu lại người chơi này?") == JOptionPane.YES_OPTION) {
+                        if (requestSendToServer(MAIN_REQUEST_PORT, "Rematch", true).getObject().equals(true)) {
+                            rematch = true;
+                        }
+                        else {
+                            gameView.showMessageDialog("Người chơi còn lại từ chối");
+                        }
+                    }
+                    else {
+                        requestSendToServer(MAIN_REQUEST_PORT, "Rematch", false);
+                    }
+
+                    if (rematch) {
+                        NguoiChoi nguoiChoi = gameView.getNguoichoi();
+                        gameView.dispose();
+                        running = false;
+
+                        GameView newGameView = new GameView(nguoiChoi);
+                        GameController newGameController = new GameController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, newGameView);
+                        newGameController.play();
+                    }
+                    else {
+                        OnlineView onlineView = new OnlineView(GameController.this.gameView.getNguoichoi());
+                        onlineView.setVisible(true);
+                        OnlineController onlineController = new OnlineController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, onlineView);
+                        onlineController.play();
+                        gameView.dispose();
+                        return;
+                    }
                 }
             }
         }

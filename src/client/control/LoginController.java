@@ -2,6 +2,7 @@ package client.control;
 
 import client.view.LoginView;
 import client.view.OnlineView;
+import model.Message;
 import model.NguoiChoi;
 
 import java.awt.event.ActionEvent;
@@ -11,9 +12,9 @@ public class LoginController extends ClientController{
     private final int MAIN_REQUEST_PORT;
     private LoginView loginView;
 
-    public LoginController(String hostname, int hostPort , LoginView loginView){
-        super(hostname);
-        MAIN_REQUEST_PORT = hostPort;
+    public LoginController(String hostName, int hostPort , LoginView loginView){
+        super(hostName);
+        this.MAIN_REQUEST_PORT = hostPort;
         this.loginView = loginView;
         loginView.setVisible(true);
         openConnection(hostPort);
@@ -23,11 +24,12 @@ public class LoginController extends ClientController{
                 NguoiChoi nguoichoi = loginView.getNguoiChoiFromInputs();
                 int res = checkLogin(nguoichoi);
                 if (res != -1) {
+                    sendObject(MAIN_REQUEST_PORT, new Message("Stop"));
                     nguoichoi.setId(res);
                     OnlineView onlineView = new OnlineView(nguoichoi);
-                    loginView.setVisible(false);
+                    loginView.dispose();
                     onlineView.setVisible(true);
-                    OnlineController onlineController = new OnlineController(hostname, MAIN_REQUEST_PORT, 9998, onlineView);
+                    OnlineController onlineController = new OnlineController(hostName, MAIN_REQUEST_PORT, 9998, onlineView);
                     onlineController.play();
                 }
                 else {

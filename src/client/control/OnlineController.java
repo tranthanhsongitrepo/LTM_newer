@@ -44,19 +44,31 @@ public class OnlineController extends ClientController{
             }
         });
 
+        onlineView.addExitButtonListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                running = false;
+                onlineView.dispose();
+            }
+        });
+
         onlineView.addOnlinePlayersTableListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (onlineView.showConfirmDialog("Bạn có muốn thách đấu người chơi này") == JOptionPane.YES_OPTION){
-                        if (requestSendToServer(MAIN_REQUEST_PORT,"Challenge", onlineView.getJTable().getValueAt(onlineView.getJTable().getSelectedRow(), 0)).getAction().equals("Accept")) {
+                        if (requestSendToServer(SUB_REQUEST_PORT,"Challenge", onlineView.getJTable().getValueAt(onlineView.getJTable().getSelectedRow(), 0)).getAction().equals("Accept")) {
 
+                            sendObject(MAIN_REQUEST_PORT, new Message("Stop"));
+                            sendObject(SUB_REQUEST_PORT, new Message("Stop"));
+
+                            System.out.println("Challenge accepted");
                             // Lock the thread until the RequestListener is fully closed
                             while (true) {
                                 if (!running)
                                     break;
                             }
                             GameView gameView = new GameView(onlineView.getNguoichoi());
-                            GameController gameController = new GameController(hostname, MAIN_REQUEST_PORT, gameView);
+                            GameController gameController = new GameController(hostname, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, gameView);
                             gameController.play();
                             onlineView.dispose();
                     }
@@ -90,9 +102,10 @@ public class OnlineController extends ClientController{
                             sendObject(MAIN_REQUEST_PORT, new Message(choice == JOptionPane.YES_OPTION ? "Accept" : "Decline", message.getObject()));
                             if (choice == JOptionPane.YES_OPTION) {
                                 running = false;
-
+                                sendObject(MAIN_REQUEST_PORT, new Message("Stop"));
+                                sendObject(SUB_REQUEST_PORT, new Message("Stop"));
                                 GameView gameView = new GameView(onlineView.getNguoichoi());
-                                GameController gameController = new GameController(OnlineController.this.hostName, MAIN_REQUEST_PORT, gameView);
+                                GameController gameController = new GameController(OnlineController.this.hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, gameView);
                                 gameController.play();
                                 OnlineController.this.onlineView.dispose();
                             }
@@ -111,7 +124,7 @@ public class OnlineController extends ClientController{
                     break;
                 }
             }
-            closeConnection(MAIN_REQUEST_PORT);
+            OnlineController.this.sendObject(MAIN_REQUEST_PORT, new Message("Stop"));
         }
     }
 }

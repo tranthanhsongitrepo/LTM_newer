@@ -2,48 +2,46 @@ package model;
 
 public class BangXepHang extends NguoiChoi {
 
-	private int tongSoDiem;
-	private float trungBinhDiemDoiThu;
-	private float trungBinhSoNuocDiTranThang;
-	private float trungBinhNuocDiTranThua;
+	private float tongSoDiem;
+	private float tongDiemDoiThu;
+	private int tongSoNuocDiTranThang;
+	private int tongSoNuocDiTranThua;
 	private int soTranDauDaChoi;
-	private int soTranThang;
-	private int soTranThua;
-
-	public BangXepHang(String tenDangNhap, String matKhau) {
-		super(tenDangNhap, matKhau);
+	private int soTranThang, soTranThua;
+	public BangXepHang(String tenDangNhap) {
+		super(tenDangNhap);
 	}
 
-	public int getTongSoDiem() {
+	public float getTongSoDiem() {
 		return tongSoDiem;
 	}
 
-	public void setTongSoDiem(int tongSoDiem) {
+	public void setTongSoDiem(float tongSoDiem) {
 		this.tongSoDiem = tongSoDiem;
 	}
 
-	public float getTrungBinhDiemDoiThu() {
-		return trungBinhDiemDoiThu;
+	public float getTongDiemDoiThu() {
+		return tongDiemDoiThu;
 	}
 
-	public void setTrungBinhDiemDoiThu(float trungBinhDiemDoiThu) {
-		this.trungBinhDiemDoiThu = trungBinhDiemDoiThu;
+	public void setTongDiemDoiThu(float TongDiemDoiThu) {
+		this.tongDiemDoiThu = tongDiemDoiThu;
 	}
 
-	public float getTrungBinhSoNuocDiTranThang() {
-		return trungBinhSoNuocDiTranThang;
+	public int getTongSoNuocDiTranThang() {
+		return tongSoNuocDiTranThang;
 	}
 
-	public void setTrungBinhSoNuocDiTranThang(float trungBinhSoNuocDiTranThang) {
-		this.trungBinhSoNuocDiTranThang = trungBinhSoNuocDiTranThang;
+	public void setTongSoNuocDiTranThang(int tongSoNuocDiTranThang) {
+		this.tongSoNuocDiTranThang = tongSoNuocDiTranThang;
 	}
 
-	public float getTrungBinhNuocDiTranThua() {
-		return trungBinhNuocDiTranThua;
+	public int getTongSoNuocDiTranThua() {
+		return tongSoNuocDiTranThua;
 	}
 
-	public void setTrungBinhNuocDiTranThua(float trungBinhNuocDiTranThua) {
-		this.trungBinhNuocDiTranThua = trungBinhNuocDiTranThua;
+	public void setTongSoNuocDiTranThua(int tongSoNuocDiTranThua) {
+		this.tongSoNuocDiTranThua = tongSoNuocDiTranThua;
 	}
 
 	public int getSoTranDauDaChoi() {
@@ -69,4 +67,5 @@ public class BangXepHang extends NguoiChoi {
 	public void setSoTranThua(int soTranThua) {
 		this.soTranThua = soTranThua;
 	}
+
 }

@@ -25,7 +25,8 @@ public class ClientController {
         this.iss = new HashMap<>();
     }
 
-    public synchronized Message requestSendToServer(int port, String action, Object object) {
+    public Message requestSendToServer(int port, String action, Object object) {
+        System.out.println(action);
         Message message = new Message(action, object);
         sendObject(port, message);
         return (Message) receiveObject(port);
@@ -33,7 +34,6 @@ public class ClientController {
 
     public Object receiveObject(int port) {
         try {
-
             synchronized (iss.get(port)) {
                 return iss.get(port).readObject();
             }
@@ -43,7 +43,7 @@ public class ClientController {
         return null;
     }
 
-    public synchronized Message requestObjectFromServer(int port, String action) {
+    public Message requestObjectFromServer(int port, String action) {
         System.out.println(action);
         Message message = new Message(action);
         sendObject(port, message);
@@ -56,6 +56,8 @@ public class ClientController {
             this.clientSockets.put(port, socket);
             this.oss.put(port, new ObjectOutputStream(socket.getOutputStream()));
             this.iss.put(port, new ObjectInputStream(socket.getInputStream()));
+
+            this.oss.get(port).reset();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -81,7 +83,6 @@ public class ClientController {
             synchronized (oss.get(port)) {
                 oss.get(port).writeObject(object);
                 oss.get(port).flush();
-                oss.get(port).reset();
             }
         } catch (IOException e) {
             e.printStackTrace();

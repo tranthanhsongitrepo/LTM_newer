@@ -15,6 +15,11 @@ public class NguoiChoi implements Serializable{
 		this.matKhau = matKhau;
 	}
 
+	public NguoiChoi(String tenDangNhap) {
+		this.tenDangNhap = tenDangNhap;
+		this.matKhau = "";
+	}
+
 	@Override
 	public boolean equals(Object b) {
 		return this.getTenDangNhap().equals(((NguoiChoi) b).getTenDangNhap()) || this.getId() == ((NguoiChoi) b).getId();

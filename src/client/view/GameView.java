@@ -133,7 +133,11 @@ public class GameView extends javax.swing.JFrame {
         return nguoichoi;
     }
 
-    public void showDialog(String message) {
+    public int showDialog(String message) {
+        return JOptionPane.showConfirmDialog(null, message, "", JOptionPane.YES_NO_OPTION);
+    }
+
+    public void showMessageDialog(String message) {
         JOptionPane.showMessageDialog(null, message);
     }
 

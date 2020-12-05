@@ -5,6 +5,7 @@
  */
 package client.view;
 
+import model.BangXepHang;
 import model.NguoiChoi;
 
 import javax.swing.table.DefaultTableModel;
@@ -82,9 +83,23 @@ public class RankView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    public void updateTable(ArrayList<Object[]> objects) {
-        for (Object[] object : objects) {
-            ((DefaultTableModel) jTable1.getModel()).addRow(object);
+    public void addExitButtonListener(java.awt.event.ActionListener actionListener) {
+        jButton1.addActionListener(actionListener);
+    }
+
+    public void updateTable(ArrayList<BangXepHang> objects) {
+        ((DefaultTableModel) jTable1.getModel()).setRowCount(objects.size());
+        for (int i = 0; i < objects.size(); i++) {
+            int tongSoTranDau = objects.get(i).getSoTranDauDaChoi();
+            jTable1.setValueAt(i + 1, i, 0);
+            jTable1.setValueAt(objects.get(i).getTenDangNhap(), i, 1);
+            jTable1.setValueAt(objects.get(i).getTongSoDiem(), i, 2);
+            jTable1.setValueAt((float) objects.get(i).getTongDiemDoiThu() / tongSoTranDau, i, 3);
+            float t = (float) objects.get(i).getTongSoNuocDiTranThang() / objects.get(i).getSoTranThang();
+            jTable1.setValueAt(objects.get(i).getSoTranThang() == 0 ? 0 : t, i, 4);
+            t = (float) objects.get(i).getTongSoNuocDiTranThua() / objects.get(i).getSoTranThua();
+            jTable1.setValueAt(objects.get(i).getSoTranThua() == 0 ? 0 : t, i, 5);
+
         }
     }
 

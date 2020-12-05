@@ -58,7 +58,7 @@ public class OnlineView extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        jButton1.setText("Quay lại");
+        jButton1.setText("Thoát");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -142,6 +142,10 @@ public class OnlineView extends javax.swing.JFrame {
     }
     public int showConfirmDialog(String s) {
         return JOptionPane.showConfirmDialog(null, s);
+    }
+
+    public void addExitButtonListener(ActionListener actionListener) {
+        jButton1.addActionListener(actionListener);
     }
     // End of variables declaration//GEN-END:variables
 }
