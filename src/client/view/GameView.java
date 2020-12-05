@@ -133,7 +133,7 @@ public class GameView extends javax.swing.JFrame {
         return nguoichoi;
     }
 
-    public int showDialog(String message) {
+    public int showConfirmDialog(String message) {
         return JOptionPane.showConfirmDialog(null, message, "", JOptionPane.YES_NO_OPTION);
     }
 
@@ -164,6 +164,9 @@ public class GameView extends javax.swing.JFrame {
         return piece;
     }
 
+    public void addQuitButtonListener(java.awt.event.ActionListener actionListener) {
+        jButton1.addActionListener(actionListener);
+    }
     public void setPiece(char piece) {
         this.piece = piece;
         this.opPiece = piece == 'x' ? 'o' : 'x';

@@ -157,7 +157,7 @@ public class ServerController extends Thread{
                             break;
 
                         case "Turn":
-                            message.setObject(getOngoingGame(this.clientAddress.getAddress()).getTurn());
+                            message.setObject(getOngoingGame(this.clientAddress.getAddress()).getLuot());
                             sendMessage(clientAddress, message);
                             break;
                         case "ToaDo":
@@ -258,15 +258,20 @@ public class ServerController extends Thread{
                             onGoingGames.remove(this.clientAddress.getAddress());
                             break;
 
+                        case "Quit":
+                            onGoingGames.get(this.clientAddress.getAddress()).thoatGame(addressNguoiChoi.get(this.clientAddress.getAddress()).getId());
+                            sendMessage(this.clientAddress, new Message("Quit"));
+                            break;
+
                         case "Rematch":
                             System.out.println("Rematch");;
                             game = getOngoingGame(this.clientAddress.getAddress());
                             game.rematch((Boolean) message.getObject());
 
                             // Wait for all 2 clients to respond
-                            while (game.getResponses() != 2) {}
+                            while (game.getTraLoi() != 2) {}
 
-                            sendMessage(this.clientAddress, new Message("Rematch", game.getRematch()));
+                            sendMessage(this.clientAddress, new Message("Rematch", game.getDauLai()));
                             break;
                     }
                 }

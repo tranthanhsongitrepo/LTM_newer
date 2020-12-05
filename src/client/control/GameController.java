@@ -6,6 +6,8 @@ import model.NguoiChoi;
 import model.ToaDo;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -87,6 +89,21 @@ public class GameController extends ClientController{
                 }
             }
         };
+        gameView.addQuitButtonListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (gameView.showConfirmDialog("Bạn có chắc bạn muốn thoát trận?") == JOptionPane.YES_OPTION) {
+                    requestObjectFromServer(MAIN_REQUEST_PORT, "Quit");
+
+                    OnlineView onlineView = new OnlineView(GameController.this.gameView.getNguoichoi());
+                    onlineView.setVisible(true);
+                    OnlineController onlineController = new OnlineController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, onlineView);
+                    onlineController.play();
+                    gameView.dispose();
+
+                }
+            }
+        });
         gameView.getJTable().addMouseListener(mouseAdapter);
     }
 
@@ -115,31 +132,39 @@ public class GameController extends ClientController{
                 }
                 ToaDo nuocDiGanNhat = (ToaDo) GameController.this.requestSendToServer(MAIN_REQUEST_PORT, "ToaDo", GameController.this.gameView.getNguoichoi()).getObject();
 
-                if (nuocDiGanNhat == null)
-                    continue;
-
-                if (GameController.this.gameView.getJTable().getValueAt(nuocDiGanNhat.getY(), nuocDiGanNhat.getX()) == null) {
+                if (nuocDiGanNhat != null && GameController.this.gameView.getJTable().getValueAt(nuocDiGanNhat.getY(), nuocDiGanNhat.getX()) == null) {
                     GameController.this.gameView.oponentMove(nuocDiGanNhat);
                 }
 
                 int status = (int) GameController.this.requestObjectFromServer(MAIN_REQUEST_PORT, "Status").getObject();
                 if (status != -1) {
-                    if (status != 0)
-                        gameView.showMessageDialog("Người chơi " + (status == 'x' ? 1 : 2) + " thắng");
-                    else
-                        gameView.showDialog("Hòa");
+                    switch (status) {
+                        case 'x':
+                            gameView.showMessageDialog("Người chơi 1 thắng");
+                            break;
+                        case 'o':
+                            gameView.showMessageDialog("Người chơi 2 thắng");
+                            break;
+                        case -2:
+                            gameView.showMessageDialog("Đối thủ đã thoát");
+                            break;
+                        case 0:
+                            gameView.showConfirmDialog("Hòa");
+                            break;
+                    }
 
                     boolean rematch = false;
-                    if (gameView.showDialog("Bạn có muốn thách đấu lại người chơi này?") == JOptionPane.YES_OPTION) {
-                        if (requestSendToServer(MAIN_REQUEST_PORT, "Rematch", true).getObject().equals(true)) {
-                            rematch = true;
+
+                    if (status != -2) {
+                        if (gameView.showConfirmDialog("Bạn có muốn thách đấu lại người chơi này?") == JOptionPane.YES_OPTION) {
+                            if (requestSendToServer(MAIN_REQUEST_PORT, "Rematch", true).getObject().equals(true)) {
+                                rematch = true;
+                            } else {
+                                gameView.showMessageDialog("Người chơi còn lại từ chối");
+                            }
+                        } else {
+                            requestSendToServer(MAIN_REQUEST_PORT, "Rematch", false);
                         }
-                        else {
-                            gameView.showMessageDialog("Người chơi còn lại từ chối");
-                        }
-                    }
-                    else {
-                        requestSendToServer(MAIN_REQUEST_PORT, "Rematch", false);
                     }
 
                     if (rematch) {
@@ -149,10 +174,9 @@ public class GameController extends ClientController{
                         GameView newGameView = new GameView(nguoiChoi);
                         GameController newGameController = new GameController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, newGameView);
                         newGameController.play();
-                    }
-                    else {
+                    } else {
                         running = false;
-                        
+
                         OnlineView onlineView = new OnlineView(GameController.this.gameView.getNguoichoi());
                         onlineView.setVisible(true);
                         OnlineController onlineController = new OnlineController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, onlineView);
