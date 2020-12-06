@@ -149,7 +149,7 @@ public class GameController extends ClientController{
                             gameView.showMessageDialog("Đối thủ đã thoát");
                             break;
                         case 0:
-                            gameView.showConfirmDialog("Hòa");
+                            gameView.showMessageDialog("Hòa");
                             break;
                     }
 
@@ -174,6 +174,7 @@ public class GameController extends ClientController{
                         GameView newGameView = new GameView(nguoiChoi);
                         GameController newGameController = new GameController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, newGameView);
                         newGameController.play();
+                        return;
                     } else {
                         running = false;
 
@@ -182,10 +183,11 @@ public class GameController extends ClientController{
                         OnlineController onlineController = new OnlineController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, onlineView);
                         onlineController.play();
                         gameView.dispose();
-                        return;
                     }
                 }
             }
+            GameController.this.requestObjectFromServer(MAIN_REQUEST_PORT, "Finished");
+
         }
     }
 }

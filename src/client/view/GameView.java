@@ -83,7 +83,6 @@ public class GameView extends javax.swing.JFrame {
                 }
         ));
         jScrollPane1.setViewportView(jTable1);
-
         jButton1.setText("Thoát");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

@@ -72,7 +72,7 @@ public class ServerGameController {
             while (j >= 0 && banCo[i][j] == player) {
                 j--;
             }
-            counts[L] = nuocDiGanNhat.getX() - j;
+            counts[L] = nuocDiGanNhat.getX() - j - 1;
 
             if (counts[L] + 1 >= 5) {
                 won = true;
@@ -85,9 +85,9 @@ public class ServerGameController {
             while (j < banCo[i].length && banCo[i][j] == player) {
                 j++;
             }
-            counts[R] = j - nuocDiGanNhat.getX();
+            counts[R] = j - nuocDiGanNhat.getX() - 1;
 
-            if (counts[L] + counts[R] - 1 >= 5) {
+            if (counts[L] + counts[R] + 1 >= 5) {
                 won = true;
             }
 
@@ -98,9 +98,9 @@ public class ServerGameController {
             while (i >= 0 && banCo[i][j] == player) {
                 i--;
             }
-            counts[U] = nuocDiGanNhat.getY() - i;
+            counts[U] = nuocDiGanNhat.getY() - i - 1;
 
-            if (counts[U] >= 5) {
+            if (counts[U] + 1 >= 5) {
                 won = true;
             }
 
@@ -111,9 +111,9 @@ public class ServerGameController {
             while (i < banCo.length && banCo[i][j] == player) {
                 i++;
             }
-            counts[D] = i - nuocDiGanNhat.getY();
+            counts[D] = i - nuocDiGanNhat.getY() - 1;
 
-            if (counts[D] + counts[U] - 1 >= 5) {
+            if (counts[D] + counts[U] + 1 >= 5) {
                 won = true;
             }
 
@@ -125,9 +125,9 @@ public class ServerGameController {
                 i--;
                 j--;
             }
-            counts[UL] = nuocDiGanNhat.getY() - i;
+            counts[UL] = nuocDiGanNhat.getY() - i - 1;
 
-            if (counts[UL] >= 5) {
+            if (counts[UL] + 1 >= 5) {
                 won = true;
             }
 
@@ -139,9 +139,9 @@ public class ServerGameController {
                 i++;
                 j++;
             }
-            counts[DR] = i - nuocDiGanNhat.getY();
+            counts[DR] = i - nuocDiGanNhat.getY() - 1;
 
-            if (counts[UL] + counts[DR] - 1 >= 5) {
+            if (counts[UL] + counts[DR] + 1 >= 5) {
                 won = true;
             }
 
@@ -153,9 +153,9 @@ public class ServerGameController {
                 i--;
                 j++;
             }
-            counts[UR] = nuocDiGanNhat.getY() - i;
+            counts[UR] = nuocDiGanNhat.getY() - i - 1;
 
-            if (counts[UR] >= 5) {
+            if (counts[UR] + 1 >= 5) {
                 won = true;
             }
 
@@ -167,7 +167,7 @@ public class ServerGameController {
                 i++;
                 j--;
             }
-            counts[DL] = i - nuocDiGanNhat.getY();
+            counts[DL] = i - nuocDiGanNhat.getY() - 1;
 
             if (counts[UR] + counts[DL] - 1 >= 5) {
                 won = true;

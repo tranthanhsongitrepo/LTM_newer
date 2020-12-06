@@ -92,6 +92,23 @@ public class ServerController extends Thread{
         return addressNguoiChoi.get(address);
     }
 
+    public ArrayList<BangXepHang> getOnlineList() {
+        BangXepHangDAO bangXepHangDAO = new BangXepHangDAO("jdbc:mysql://127.0.0.1:3306/?useSSL=false", "root", "password");
+        Set<NguoiChoi> onlineList = nguoiChoiAddresses.keySet();
+
+        ArrayList<BangXepHang> rankings = bangXepHangDAO.getRankings(onlineList);
+
+        for (BangXepHang it : rankings) {
+            if (onGoingGames.get(nguoiChoiAddresses.get(it)) != null) {
+                it.setTrangThai("Bận");
+            }
+            else {
+                it.setTrangThai("Online");
+            }
+        }
+        bangXepHangDAO.closeConnection();
+        return rankings;
+    }
 
     class ConnectionListener extends Thread {
         private final int port;
@@ -206,23 +223,7 @@ public class ServerController extends Thread{
 
                         case "OnlineList":
                             response = message;
-                            Set<NguoiChoi> onlineList = nguoiChoiAddresses.keySet();
-
-                            BangXepHangDAO bangXepHangDAO = new BangXepHangDAO("jdbc:mysql://127.0.0.1:3306/?useSSL=false", "root", "password");
-
-                            ArrayList<BangXepHang> rankings = bangXepHangDAO.getRankings(onlineList);
-
-                            for (BangXepHang it : rankings) {
-                                if (onGoingGames.get(nguoiChoiAddresses.get(it)) != null) {
-                                    it.setTrangThai("Bận");
-                                }
-                                else {
-                                    it.setTrangThai("Online");
-                                }
-                            }
-                            bangXepHangDAO.closeConnection();
-
-                            response.setObject(rankings);
+                            response.setObject(getOnlineList());
                             sendMessage(this.clientAddress, response);
                             break;
                         case "Accept":
@@ -261,6 +262,11 @@ public class ServerController extends Thread{
                         case "Quit":
                             onGoingGames.get(this.clientAddress.getAddress()).thoatGame(addressNguoiChoi.get(this.clientAddress.getAddress()).getId());
                             sendMessage(this.clientAddress, new Message("Quit"));
+                            break;
+
+                        case "Finished":
+                            onGoingGames.remove(this.clientAddress.getAddress());
+                            sendMessage(this.clientAddress, new Message("OK"));
                             break;
 
                         case "Rematch":

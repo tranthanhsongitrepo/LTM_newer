@@ -50,7 +50,7 @@ public class BangXepHangDAO extends DAO {
             String query = "SELECT tenDangNhap, tongSoDiem, tongDiemDoiThu, tongSoNuocDiTranThang, tongSoNuocDiTranThua, tongSoTranDau, tongSoTranThang, tongSoTranThua " +
                     "FROM LTM.tbl_nguoiChoi INNER JOIN LTM.tbl_bangXepHang " +
                     "ON LTM.tbl_bangXepHang.tbl_nguoiChoiID = LTM.tbl_nguoiChoi.id " +
-                    "ORDER BY tongSoDiem, tongDiemDoiThu, tongSoNuocDiTranThang, tongSoNuocDiTranThua";
+                    "ORDER BY tongSoDiem DESC, tongDiemDoiThu DESC, tongSoNuocDiTranThang DESC, tongSoNuocDiTranThua DESC";
             PreparedStatement preparedStatement = this.con.prepareStatement(query);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
