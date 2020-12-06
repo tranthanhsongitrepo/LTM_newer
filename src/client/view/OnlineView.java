@@ -40,16 +40,16 @@ public class OnlineView extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        tblDanhSachNguoiChoiDangOnline = new javax.swing.JTable();
+        btnThoat = new javax.swing.JButton();
+        btnLamMoi = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton3.setText("Xem xếp hạng");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Danh sách online");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblDanhSachNguoiChoiDangOnline.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -57,16 +57,16 @@ public class OnlineView extends javax.swing.JFrame {
                 "Tên tài khoản", "Tổng số điểm hiện tại", "Trạng thái online"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblDanhSachNguoiChoiDangOnline);
 
-        jButton1.setText("Thoát");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnThoat.setText("Thoát");
+        btnThoat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Làm mới");
+        btnLamMoi.setText("Làm mới");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -79,9 +79,9 @@ public class OnlineView extends javax.swing.JFrame {
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                                 .addComponent(jButton3)
                                                 .addGap(18, 18, 18)
-                                                .addComponent(jButton2)
+                                                .addComponent(btnLamMoi)
                                                 .addGap(18, 18, 18)
-                                                .addComponent(jButton1)))
+                                                .addComponent(btnThoat)))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -91,8 +91,8 @@ public class OnlineView extends javax.swing.JFrame {
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jButton1)
-                                        .addComponent(jButton2)
+                                        .addComponent(btnThoat)
+                                        .addComponent(btnLamMoi)
                                         .addComponent(jButton3))
                                 .addGap(90, 90, 90))
         );
@@ -105,35 +105,35 @@ public class OnlineView extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton btnThoat;
+    private javax.swing.JButton btnLamMoi;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblDanhSachNguoiChoiDangOnline;
     private javax.swing.JButton jButton3;
 
     public JTable getJTable() {
-        return jTable1;
+        return tblDanhSachNguoiChoiDangOnline;
     }
     public void addRefreshButtonListener(ActionListener actionListener) {
-        jButton2.addActionListener(actionListener);
+        btnLamMoi.addActionListener(actionListener);
     }
 
     public void addOnlinePlayersTableListener(MouseAdapter mouseAdapter) {
-        jTable1.addMouseListener(mouseAdapter);
+        tblDanhSachNguoiChoiDangOnline.addMouseListener(mouseAdapter);
     }
     public NguoiChoi getNguoichoi() {
         return nguoichoi;
     }
 
     public void updateTable(ArrayList<BangXepHang> objects) {
-        ((DefaultTableModel) jTable1.getModel()).setRowCount(objects.size() - 1);
+        ((DefaultTableModel) tblDanhSachNguoiChoiDangOnline.getModel()).setRowCount(objects.size() - 1);
         int j = 0;
         for (int i = 0; i < objects.size(); i++) {
             BangXepHang curNguoiChoi = objects.get(i);
             if (curNguoiChoi.getId() != this.getNguoichoi().getId()) {
-                jTable1.setValueAt(curNguoiChoi.getTenDangNhap(), j, 0);
-                jTable1.setValueAt(curNguoiChoi.getTongDiem(), j, 1);
-                jTable1.setValueAt(curNguoiChoi.getTrangThai(), j, 2);
+                tblDanhSachNguoiChoiDangOnline.setValueAt(curNguoiChoi.getTenDangNhap(), j, 0);
+                tblDanhSachNguoiChoiDangOnline.setValueAt(curNguoiChoi.getTongDiem(), j, 1);
+                tblDanhSachNguoiChoiDangOnline.setValueAt(curNguoiChoi.getTrangThai(), j, 2);
                 j ++;
             }
         }
@@ -151,7 +151,7 @@ public class OnlineView extends javax.swing.JFrame {
     }
 
     public void addExitButtonListener(ActionListener actionListener) {
-        jButton1.addActionListener(actionListener);
+        btnThoat.addActionListener(actionListener);
     }
     // End of variables declaration//GEN-END:variables
 }

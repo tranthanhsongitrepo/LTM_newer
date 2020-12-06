@@ -113,7 +113,7 @@ public class GameController extends ClientController{
         }
 
         public void run() {
-
+            boolean rematch = false;
             boolean timerReseted = false;
             // TODO: Synchronize the time between the two client
             while (running) {
@@ -153,7 +153,6 @@ public class GameController extends ClientController{
                             break;
                     }
 
-                    boolean rematch = false;
 
                     if (status != -2) {
                         if (gameView.showConfirmDialog("Bạn có muốn thách đấu lại người chơi này?") == JOptionPane.YES_OPTION) {
@@ -167,6 +166,8 @@ public class GameController extends ClientController{
                         }
                     }
 
+                    running = false;
+
                     if (rematch) {
                         NguoiChoi nguoiChoi = gameView.getNguoichoi();
                         gameView.dispose();
@@ -174,9 +175,7 @@ public class GameController extends ClientController{
                         GameView newGameView = new GameView(nguoiChoi);
                         GameController newGameController = new GameController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, newGameView);
                         newGameController.play();
-                        return;
                     } else {
-                        running = false;
 
                         OnlineView onlineView = new OnlineView(GameController.this.gameView.getNguoichoi());
                         onlineView.setVisible(true);
@@ -186,7 +185,9 @@ public class GameController extends ClientController{
                     }
                 }
             }
-            GameController.this.requestObjectFromServer(MAIN_REQUEST_PORT, "Finished");
+
+            if (!rematch)
+                GameController.this.requestObjectFromServer(MAIN_REQUEST_PORT, "Finished");
 
         }
     }

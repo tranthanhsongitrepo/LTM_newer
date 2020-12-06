@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-public class ServerController extends Thread{
+public class ServerController {
     private HashMap<Integer, ServerSocket> serverSockets;
     protected HashMap<InetSocketAddress, ObjectInputStream> iss;
     protected HashMap<InetSocketAddress, ObjectOutputStream> oss;
@@ -253,11 +253,10 @@ public class ServerController extends Thread{
                             sendMessage(this.clientAddress, new Message("Piece", game.getNguoiChoi1().equals(getNguoiChoiFromAddress(this.clientAddress.getAddress())) ? 'x' : 'o'));
                             break;
                         case "Stop":
-                            running = false;
                             sendMessage(this.clientAddress, new Message("Stop"));
 
                             onGoingGames.remove(this.clientAddress.getAddress());
-                            break;
+                            return;
 
                         case "Quit":
                             onGoingGames.get(this.clientAddress.getAddress()).thoatGame(addressNguoiChoi.get(this.clientAddress.getAddress()).getId());

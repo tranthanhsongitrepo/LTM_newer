@@ -36,15 +36,15 @@ public class GameView extends javax.swing.JFrame {
     public GameView(NguoiChoi nguoichoi) {
         initComponents();
         this.nguoichoi = nguoichoi;
-        DefaultTableModel df = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel df = (DefaultTableModel) tblBanCo.getModel();
         df.setColumnCount(100);
         df.setNumRows(100);
-        jTable1.setShowGrid(true);
-        jTable1.setTableHeader(null);
-        for (int i = 0; i < jTable1.getColumnCount(); i++) {
-            jTable1.getColumnModel().getColumn(i).setMinWidth(20);
-            jTable1.getColumnModel().getColumn(i).setMaxWidth(20);
-            jTable1.getColumnModel().getColumn(0).setPreferredWidth(20);
+        tblBanCo.setShowGrid(true);
+        tblBanCo.setTableHeader(null);
+        for (int i = 0; i < tblBanCo.getColumnCount(); i++) {
+            tblBanCo.getColumnModel().getColumn(i).setMinWidth(20);
+            tblBanCo.getColumnModel().getColumn(i).setMaxWidth(20);
+            tblBanCo.getColumnModel().getColumn(0).setPreferredWidth(20);
         }
         jScrollPane1.setColumnHeader(null);
     }
@@ -59,8 +59,8 @@ public class GameView extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        tblBanCo = new javax.swing.JTable();
+        btnThoat = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel1.setText("Thời gian còn lại:");
@@ -71,7 +71,7 @@ public class GameView extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chơi game");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblBanCo.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {
                         {},
                         {},
@@ -82,9 +82,9 @@ public class GameView extends javax.swing.JFrame {
 
                 }
         ));
-        jScrollPane1.setViewportView(jTable1);
-        jButton1.setText("Thoát");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jScrollPane1.setViewportView(tblBanCo);
+        btnThoat.setText("Thoát");
+        btnThoat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
@@ -104,7 +104,7 @@ public class GameView extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel2)
                                 .addGap(204, 204, 204)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnThoat, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -114,7 +114,7 @@ public class GameView extends javax.swing.JFrame {
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+                                        .addComponent(btnThoat, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
                                         .addComponent(jLabel1)
                                         .addComponent(jLabel2))
                                 .addContainerGap())
@@ -141,22 +141,22 @@ public class GameView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify                     
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnThoat;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblBanCo;
 
     public void playerMove(ToaDo toaDo) {
-        this.jTable1.setValueAt(piece, toaDo.getY(), toaDo.getX());
+        this.tblBanCo.setValueAt(piece, toaDo.getY(), toaDo.getX());
     }
 
     public void oponentMove(ToaDo toaDo) {
-        this.jTable1.setValueAt(opPiece, toaDo.getY(), toaDo.getX());
+        this.tblBanCo.setValueAt(opPiece, toaDo.getY(), toaDo.getX());
     }
 
     public JTable getJTable() {
-        return this.jTable1;
+        return this.tblBanCo;
     }
 
     public char getPiece() {
@@ -164,7 +164,7 @@ public class GameView extends javax.swing.JFrame {
     }
 
     public void addQuitButtonListener(java.awt.event.ActionListener actionListener) {
-        jButton1.addActionListener(actionListener);
+        btnThoat.addActionListener(actionListener);
     }
     public void setPiece(char piece) {
         this.piece = piece;
