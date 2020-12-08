@@ -63,7 +63,7 @@ public class GameView extends javax.swing.JFrame {
         btnThoat = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel1.setText("Thời gian còn lại:");
+        jLabel1.setText("Thời gian đã qua:");
 
         jLabel2.setText("0s");
 

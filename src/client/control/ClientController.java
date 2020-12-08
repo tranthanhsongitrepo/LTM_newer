@@ -79,6 +79,7 @@ public class ClientController {
             synchronized (oss.get(port)) {
                 oss.get(port).writeObject(object);
                 oss.get(port).flush();
+                oss.get(port).reset();
             }
         } catch (IOException e) {
             e.printStackTrace();

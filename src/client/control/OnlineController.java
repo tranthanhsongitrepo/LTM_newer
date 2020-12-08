@@ -53,6 +53,9 @@ public class OnlineController extends ClientController{
             @Override
             public void actionPerformed(ActionEvent e) {
                 running = false;
+                sendMessage(MAIN_REQUEST_PORT, new Message("Stop"));
+                sendMessage(SUB_REQUEST_PORT, new Message("Stop"));
+
                 onlineView.dispose();
             }
         });

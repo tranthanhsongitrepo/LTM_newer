@@ -55,8 +55,12 @@ public class ServerGameController {
 
 
         // If one player left
-        if (thoatGame1 || thoatGame2) {
+        if (thoatGame1) {
            return -2;
+        }
+
+        if (thoatGame2) {
+            return -3;
         }
 
         else {

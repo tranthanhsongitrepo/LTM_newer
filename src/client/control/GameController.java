@@ -94,13 +94,6 @@ public class GameController extends ClientController{
             public void actionPerformed(ActionEvent e) {
                 if (gameView.showConfirmDialog("Bạn có chắc bạn muốn thoát trận?") == JOptionPane.YES_OPTION) {
                     requestObjectFromServer(MAIN_REQUEST_PORT, "Quit");
-
-                    OnlineView onlineView = new OnlineView(GameController.this.gameView.getNguoichoi());
-                    onlineView.setVisible(true);
-                    OnlineController onlineController = new OnlineController(hostName, MAIN_REQUEST_PORT, SUB_REQUEST_PORT, onlineView);
-                    onlineController.play();
-                    gameView.dispose();
-
                 }
             }
         });
@@ -146,7 +139,12 @@ public class GameController extends ClientController{
                             gameView.showMessageDialog("Người chơi 2 thắng");
                             break;
                         case -2:
-                            gameView.showMessageDialog("Đối thủ đã thoát");
+                            if (GameController.this.gameView.getPiece() == 'o')
+                                gameView.showMessageDialog("Đối thủ đã thoát");
+                            break;
+                        case -3:
+                            if (GameController.this.gameView.getPiece() == 'x')
+                                gameView.showMessageDialog("Đối thủ đã thoát");
                             break;
                         case 0:
                             gameView.showMessageDialog("Hòa");
@@ -154,7 +152,7 @@ public class GameController extends ClientController{
                     }
 
 
-                    if (status != -2) {
+                    if (status != -2 && status != -3) {
                         if (gameView.showConfirmDialog("Bạn có muốn thách đấu lại người chơi này?") == JOptionPane.YES_OPTION) {
                             if (requestSendToServer(MAIN_REQUEST_PORT, "Rematch", true).getObject().equals(true)) {
                                 rematch = true;
